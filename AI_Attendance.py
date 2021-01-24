@@ -3,22 +3,21 @@ import numpy as np
 import face_recognition
 import os
 from datetime import datetime
-# from PIL import ImageGrab
  
 path = 'ImagesAttendance'
-images = []
+imagesData = []
 classNames = []
 myList = os.listdir(path)
 print(myList)
 for cl in myList:
     curImg = cv2.imread(f'{path}/{cl}')
-    images.append(curImg)
+    imagesData.append(curImg)
     classNames.append(os.path.splitext(cl)[0])
 print(classNames)
  
-def findEncodings(images): #function to encode the images 
+def findEncodings(imagesData): #function to encode the images 
     encodeList = []
-    for img in images:
+    for img in imagesData:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         encode = face_recognition.face_encodings(img)[0]
         encodeList.append(encode)
@@ -36,14 +35,14 @@ def markAttendance(name): #function to write roll no.s of present students
             dtString = now.strftime('%H:%M:%S')
             f.writelines(f'\n{name},{dtString}')
  
-encodeListKnown = findEncodings(images)
+encodeListKnown = findEncodings(imagesData)
 print('Encoding Complete')
  
 cap = cv2.VideoCapture(0)
  
 while True: #loop to compare the webcam recorded face with dataset
     success, img = cap.read()
-    imgS = cv2.resize(img,(0,0),None,0.25,0.25)
+    imgS = cv2.resize(img,(0,0),None,0.26,0.26)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
  
     facesCurFrame = face_recognition.face_locations(imgS)
