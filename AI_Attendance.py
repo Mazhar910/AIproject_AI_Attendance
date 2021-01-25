@@ -6,6 +6,7 @@ from datetime import datetime
 import csv
 
 csvFileName=input("Enter the name of csv file : ")
+row_list = [["ROLL NUMBER", "TIME"]]
 path = 'ImagesAttendance'
 imagesData = []
 classNames = []
@@ -13,6 +14,7 @@ myList = os.listdir(path)
 print(myList)
 with open(csvFileName+'.csv','w',newline='') as file:
     writer = csv.writer(file)
+    writer.writerows(row_list)
 for cl in myList:
     curImg = cv2.imread(f'{path}/{cl}')
     imagesData.append(curImg)
