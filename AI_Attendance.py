@@ -34,8 +34,8 @@ def findEncodings(imagesData): #function to encode the images
  
 def markAttendance(name): #function to write roll no.s of present students
 
-    with open(csvFileName+'.csv','r+') as f:
-        myDataList = f.readlines()
+    with open(csvFileName+'.csv','r+') as newFile:
+        myDataList = newFile.readlines()
         nameList = []
         for line in myDataList:
             entry = line.split(',')
@@ -43,34 +43,45 @@ def markAttendance(name): #function to write roll no.s of present students
         if name not in nameList:
             now = datetime.now()
             dtString = now.strftime('%H:%M:%S')
-            f.writelines(f'\n{name},{dtString}')
+            newFile.writelines(f'\n{name},{dtString}')
             
 encodeListKnown = findEncodings(imagesData)
 print("Encoding Complete")
  
 cap = cv2.VideoCapture(0)
 print("Opening Camera")
- 
-while True: #loop to compare the webcam recorded face with dataset
-    success, img = cap.read()
-    imgS = cv2.resize(img,(0,0),None,0.17,0.17)
-    imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
- 
-    facesCurFrame = face_recognition.face_locations(imgS,model=MODEL)
-    encodesCurFrame = face_recognition.face_encodings(imgS,facesCurFrame)
- 
-    for encodeFace,faceLoc in zip(encodesCurFrame,facesCurFrame):
-        matches = face_recognition.compare_faces(encodeListKnown,encodeFace,TOLERANCE) #compare the encoded image to the webcam recorded image
-        faceDis = face_recognition.face_distance(encodeListKnown,encodeFace) #calculate the face distance
-        matchIndex = np.argmin(faceDis)
-        if matches[matchIndex]:
-            name = classNames[matchIndex].upper()
-            y1,x2,y2,x1 = faceLoc
-            y1, x2, y2, x1 = y1*6,x2*6,y2*6,x1*6
-            cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
-            cv2.rectangle(img,(x1,y2-35),(x2,y2),(0,255,0),cv2.FILLED)
-            cv2.putText(img,name,(x1+6,y2-6),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2) #putting a rectangular frame around face
-            markAttendance(name) #sendind the recognized roll no. to function which writes attendance
- 
-    cv2.imshow('Webcam',img)
-    cv2.waitKey(1)
+
+def faceDetection(): 
+    while True: #loop to compare the webcam recorded face with dataset
+        success, img = cap.read()
+        imgS = cv2.resize(img,(0,0),None,0.17,0.17)
+        imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
+     
+        facesCurFrame = face_recognition.face_locations(imgS,model=MODEL)
+        print(facesCurFrame)
+        encodesCurFrame = face_recognition.face_encodings(imgS,facesCurFrame)
+        print(encodesCurFrame)
+     
+        for encodeFace,faceLoc in zip(encodesCurFrame,facesCurFrame):
+            matches = face_recognition.compare_faces(encodeListKnown,encodeFace,TOLERANCE) #compare the encoded image to the webcam recorded image
+            faceDis = face_recognition.face_distance(encodeListKnown,encodeFace) #calculate the face distance
+            print(faceDis)
+            matchIndex = np.argmin(faceDis)
+            print(matchIndex)
+            print(matches[matchIndex])  
+            if matches[matchIndex]:
+                name = classNames[matchIndex].upper()
+                y1,x2,y2,x1 = faceLoc 
+                y1, x2, y2, x1 = y1*6,x2*6,y2*6,x1*6
+                cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
+                cv2.rectangle(img,(x1,y2-35),(x2,y2),(0,255,0),cv2.FILLED)
+                cv2.putText(img,name,(x1+6,y2-6),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2) #putting a rectangular frame around face
+                markAttendance(name) #sendind the recognized roll no. to function which writes attendance
+     
+        cv2.imshow('Webcam',img)
+        if cv2.waitKey(1) & 0xFF == ord("c"):
+            cv2.destroyAllWindows()
+            break
+            
+
+faceDetection()
