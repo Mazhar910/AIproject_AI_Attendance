@@ -8,7 +8,7 @@ import csv
 MODEL = 'hog'
 TOLERANCE = 0.8
 csvFileName=input("Enter the name of csv file : ")
-row_list = [["ROLL NUMBER", "TIME"]]
+row_list = [["ROLL NUMBER", "TIME", "ATTENDANCE"]]
 path = 'DATASETOFIMAGES'
 imagesData = []
 classNames = []
@@ -24,7 +24,7 @@ for element in myList:
     classNames.append(os.path.splitext(element)[0])
 #print(classNames)
  
-def findEncodings(imagesData): #function to encode the images 
+def faceEncodings(imagesData): #function to encode the images 
     encodedList = []
     for img in imagesData:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -43,9 +43,9 @@ def markAttendance(name): #function to write roll no.s of present students
         if name not in nameList:
             now = datetime.now()
             dtString = now.strftime('%H:%M:%S')
-            newFile.writelines(f'\n{name},{dtString}')
+            newFile.writelines(f'\n{name},{dtString},"PRESENT"')
             
-encodeListKnown = findEncodings(imagesData)
+encodeListKnown = faceEncodings(imagesData)
 print("Encoding Complete")
  
 cap = cv2.VideoCapture(0)
